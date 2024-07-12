@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "defines.h": "c",
+        "x86intrin.h": "c",
+        "platform.h": "c"
+    }
+}
