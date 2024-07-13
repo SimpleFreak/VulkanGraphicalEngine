@@ -7,17 +7,17 @@ typedef struct {
     void* internalState;
 } platformState_t;
 
-API b8 platformStartup(platformState_t* platformState,
+b8 platformStartup(platformState_t* platformState,
                        const char* applicationName,
                        i32 x, i32 y, i32 width, i32 height);
 
-API void platformShutdown(platformState_t* platformState);
+void platformShutdown(platformState_t* platformState);
 
-API b8 platformPumpMessages(platformState_t* platformState);
+b8 platformPumpMessages(platformState_t* platformState);
 
-void* platformAllocate(u64 size, b8 aligned);
+API void* platformAllocate(u64 size, b8 aligned);
 
-void platformFree(void* block, b8 aligned);
+API void platformFree(void* block, b8 aligned);
 
 void* platformZeroMemory(void* block, u64 size);
 
