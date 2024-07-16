@@ -15,9 +15,9 @@ void platformShutdown(platformState_t* platformState);
 
 b8 platformPumpMessages(platformState_t* platformState);
 
-API void* platformAllocate(u64 size, b8 aligned);
+void* platformAllocate(u64 size, b8 aligned);
 
-API void platformFree(void* block, b8 aligned);
+void platformFree(void* block, b8 aligned);
 
 void* platformZeroMemory(void* block, u64 size);
 

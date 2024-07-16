@@ -4,7 +4,11 @@
 
 #include "./entry.h"
 
+#include "../../engine/src/core/memory/includes/memory.h"
+
 int main(void) {
+    initializeMemory();
+
     /* Request the game instance from the application. */
     game_t gameInstance;
     if (!createGame(&gameInstance)) {
@@ -29,6 +33,8 @@ int main(void) {
         INFO("Application did not shutdown gracefully.");
         return 2;
     }
+
+    shutdownMemory();
 
     return 0;
 }

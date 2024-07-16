@@ -3,6 +3,7 @@
 #if PLATFORM_WINDOWS
 
 #include "../../core/logger.h"
+#include "../../core/input.h"
 
 #include <Windows.h>
 #include <windowsx.h>
@@ -142,15 +143,15 @@ void platformFree(void *block, b8 aligned) {
     free(block);
 }
 
-void *platformZeroMemory(void *block, u64 size) {
+void* platformZeroMemory(void *block, u64 size) {
     return memset(block, 0, size);
 }
 
-void *platformCopyMemory(void *destination, const void *source, u64 size) {
+void* platformCopyMemory(void *destination, const void *source, u64 size) {
     return memcpy(destination, source, size);
 }
 
-void *platformSetMemory(void *destination, i32 value, u64 size) {
+void* platformSetMemory(void *destination, i32 value, u64 size) {
     return memset(destination, value, size);
 }
 
@@ -212,16 +213,57 @@ LRESULT CALLBACK win32ProcessMessage(HWND hwnd, u32 message,
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
         case WM_KEYUP:
-        case WM_SYSKEYUP: {} break;
-        case WM_MOUSEMOVE: {} break;
-        case WM_MOUSEWHEEL: {} break;
+        case WM_SYSKEYUP: {
+            b8 pressed = (message == WM_KEYDOWN || message == WM_SYSKEYDOWN);
+            keys_t key = (u16)wParam;
+
+            /* Pass to the input subsystem for processing. */
+            inputProcessKey(key, pressed);
+        } break;
+        case WM_MOUSEMOVE: {
+            i32 positionX = GET_X_LPARAM(lParam);
+            i32 positionY = GET_Y_LPARAM(lParam);
+
+            /* Pass over to the input subsystem. */
+            inputProcessMouseMove(positionX, positionY);
+        } break;
+        case WM_MOUSEWHEEL: {
+            i32 deltaZ = GET_WHEEL_DELTA_WPARAM(wParam);
+            if (deltaZ != 0) {
+                /* Flatten the input to an OS-independent (-1, 1). */
+                deltaZ = (deltaZ < 0) ? -1 : 1;
+                inputProcessMouseWheel(deltaZ);
+            }
+        } break;
 
         case WM_LBUTTONDOWN:
         case WM_MBUTTONDOWN:
         case WM_RBUTTONDOWN:
         case WM_LBUTTONUP:
         case WM_MBUTTONUP:
-        case WM_RBUTTONUP: {} break;
+        case WM_RBUTTONUP: {
+            b8 pressed = message == WM_LBUTTONDOWN || message == WM_RBUTTONDOWN || message == WM_MBUTTONDOWN;
+            buttons_t mouseButton = BUTTON_MAX_BUTTONS;
+            switch (message) {
+                case WM_LBUTTONDOWN:
+                case WM_LBUTTONUP:
+                    mouseButton = BUTTON_LEFT;
+                    break;
+                case WM_MBUTTONDOWN:
+                case WM_MBUTTONUP:
+                    mouseButton = BUTTON_MIDDLE;
+                    break;
+                case WM_RBUTTONDOWN:
+                case WM_RBUTTONUP:
+                    mouseButton = BUTTON_RIGHT;
+                    break;
+            }
+
+            /* Pass over to the input subsystem. */
+            if (mouseButton != BUTTON_MAX_BUTTONS) {
+                inputProcessButton(mouseButton, pressed);
+            }
+        } break;
     }
 
     return DefWindowProcA(hwnd, message, wParam, lParam);

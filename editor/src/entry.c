@@ -2,8 +2,7 @@
 
 #include "./game.h"
 
-/* Remove this. */
-#include "../../engine/src/platforms/includes/platform.h"
+#include "../../engine/src/core/memory/includes/memory.h"
 
 /* Define the function to create a game. */
 b8 createGame(game_t* outGame) {
@@ -19,7 +18,7 @@ b8 createGame(game_t* outGame) {
     outGame->onResize = gameOnResize;
 
     /* Create the game state. */
-    outGame->state = platformAllocate(sizeof(gameState_t), FALSE);
+    outGame->state = allocate(sizeof(gameState_t), MEMORY_TAG_GAME);
 
     return TRUE;
 }
